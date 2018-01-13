@@ -1,4 +1,4 @@
-# markdown-tree
+# markdown-tree-parser
 
 Parse markdown string to Abstract Syntax Tree which we defined.
 
