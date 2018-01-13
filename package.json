@@ -1,0 +1,29 @@
+{
+  "name": "markdown-parser",
+  "version": "0.6.0",
+  "description": "Parse markdwon string to AST tree",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "ava": "^0.24.0"
+  },
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ysugimoto/markdown-parser.git"
+  },
+  "keywords": [
+    "Markdown"
+  ],
+  "author": "Yoshiaki Sugimoto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ysugimoto/markdown-parser/issues"
+  },
+  "homepage": "https://github.com/ysugimoto/markdown-parser#readme"
+}
