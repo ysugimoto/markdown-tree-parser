@@ -1,5 +1,5 @@
-const nodes = require('./nodes.js');
-const helper = require('../helper.js');
+const nodes = require('../nodes/inline.js');
+const helper = require('./helper.js');
 
 const MODE_DEFAULT = 0;
 const MODE_ASTERISK = 1;
@@ -37,22 +37,22 @@ module.exports = text => {
           if (text[i + 1] === '*') {
             i++
             if (mode === MODE_ASTERISK_TRIPLE) {
-              ast.push(nodes.inline(stack, 'emitalic'));
+              ast.push(new nodes.EmItalic(stack));
               mode = MODE_DEFAULT;
             } else {
               if (!helper.isEmpty(stack)) {
-                ast.push(nodes.inline(stack));
+                ast.push(new nodes.Text(stack));
               }
               mode = MODE_ASTERISK_TRIPLE;
             }
             stack = '';
           } else {
             if (mode === MODE_ASTERISK_DOUBLE) {
-              ast.push(nodes.inline(stack, 'em'));
+              ast.push(new nodes.Em(stack));
               mode = MODE_DEFAULT;
             } else {
               if (!helper.isEmpty(stack)) {
-                ast.push(nodes.inline(stack));
+                ast.push(new nodes.Text(stack));
               }
               mode = MODE_ASTERISK_DOUBLE;
             }
@@ -61,11 +61,11 @@ module.exports = text => {
           continue;
         }
         if (mode === MODE_ASTERISK) {
-          ast.push(nodes.inline(stack, 'italic'));
+          ast.push(new nodes.Italic(stack));
           mode = MODE_DEFAULT;
         } else {
           if (!helper.isEmpty(stack)) {
-            ast.push(nodes.inline(stack));
+            ast.push(new nodes.Text(stack));
           }
           mode = MODE_ASTERISK;
         }
@@ -77,22 +77,22 @@ module.exports = text => {
           if (text[i + 1] === '_') {
             i++
             if (mode === MODE_UNDERLINE_TRIPLE) {
-              ast.push(nodes.inline(stack, 'emitalic'));
+              ast.push(new nodes.EmItalic(stack));
               mode = MODE_DEFAULT;
             } else {
               if (!helper.isEmpty(stack)) {
-                ast.push(nodes.inline(stack));
+                ast.push(new nodes.Text(stack));
               }
               mode = MODE_UNDERLINE_TRIPLE;
             }
             stack = '';
           } else {
             if (mode === MODE_UNDERLINE_DOUBLE) {
-              ast.push(nodes.inline(stack, 'em'));
+              ast.push(new nodes.Em(stack));
               mode = MODE_DEFAULT;
             } else {
               if (!helper.isEmpty(stack)) {
-                ast.push(nodes.inline(stack));
+                ast.push(new nodes.Text(stack));
               }
               mode = MODE_UNDERLINE_DOUBLE;
             }
@@ -101,11 +101,11 @@ module.exports = text => {
           continue;
         }
         if (mode === MODE_UNDERLINE) {
-          ast.push(nodes.inline(stack, 'italic'));
+          ast.push(new nodes.Italic(stack));
           mode = MODE_DEFAULT;
         } else {
           if (!helper.isEmpty(stack)) {
-            ast.push(nodes.inline(stack));
+            ast.push(new nodes.Text(stack));
           }
           mode = MODE_UNDERLINE;
         }
@@ -115,11 +115,11 @@ module.exports = text => {
         if (text[i + 1] === '~') {
           i++
           if (mode === MODE_STRIKETHROUGH) {
-            ast.push(nodes.inline(stack, 'strikethrough'));
+            ast.push(new nodes.Strikethrough(stack));
             mode = MODE_DEFAULT;
           } else {
             if (!helper.isEmpty(stack)) {
-              ast.push(nodes.inline(stack));
+              ast.push(new nodes.Text(stack));
             }
             mode = MODE_STRIKETHROUGH;
           }
@@ -130,11 +130,11 @@ module.exports = text => {
         continue;
       case "`":
         if (mode === MODE_INLINE_CODE) {
-          ast.push(nodes.inline(stack, 'code'));
+          ast.push(new nodes.InlineCode(stack));
           mode = MODE_DEFAULT;
         } else {
           if (!helper.isEmpty(stack)) {
-            ast.push(nodes.inline(stack));
+            ast.push(new nodes.Text(stack));
           }
           mode = MODE_INLINE_CODE;
         }
@@ -142,7 +142,7 @@ module.exports = text => {
         continue;
       case "!":
         if (!helper.isEmpty(stack)) {
-          ast.push(nodes.inline(stack));
+          ast.push(new nodes.Text(stack));
         }
         stack = '';
         mode = MODE_IMAGE;
@@ -151,7 +151,7 @@ module.exports = text => {
       case "[":
         if (mode !== MODE_IMAGE) {
           if (!helper.isEmpty(stack)) {
-            ast.push(nodes.inline(stack));
+            ast.push(new nodes.Text(stack));
           }
           mode = MODE_LINK;
           stack = char;
@@ -162,11 +162,11 @@ module.exports = text => {
       case ")":
         stack += char;
         if (mode === MODE_IMAGE) {
-          ast.push(nodes.image(stack));
+          ast.push(new nodes.Image(stack));
           mode = MODE_DEFAULT;
           stack = '';
         } else if (mode === MODE_LINK) {
-          ast.push(nodes.link(stack));
+          ast.push(new nodes.Link(stack));
           mode = MODE_DEFAULT;
           stack = '';
         } else {
@@ -182,7 +182,23 @@ module.exports = text => {
     }
   }
   if (!helper.isEmpty(stack)) {
-    ast.push(nodes.inline(stack));
+    const prev = ast[ast.length - 1];
+    if (!prev || mode === MODE_DEFAULT) {
+      ast.push(new nodes.Text(stack));
+    } else {
+      let prefix = '';
+      switch (mode) {
+        case MODE_ASTERISK: prefix = '*'; break;
+        case MODE_ASTERISK_DOUBLE: prefix = '**'; break;
+        case MODE_ASTERISK_TRIPLE: prefix = '**'; break;
+        case MODE_UNDERLINE: prefix = '_'; break;
+        case MODE_UNDERLINE_DOUBLE: prefix = '__'; break;
+        case MODE_UNDERLINE_TRIPLE: prefix = '___'; break;
+        case MODE_STRIKETHROUGH: prefix = '~~'; break;
+        case MODE_INLINE_CODE: prefix = '`'; break;
+      }
+      prev.value += `${prefix}${stack}`;
+    }
   }
   return ast;
 };

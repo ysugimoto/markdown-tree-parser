@@ -1,9 +1,8 @@
-const parseInline = require('../inline/parser.js');
-const SyntaxError = require('../syntax-error.js');
-const nodes = require('./nodes.js');
-const helper = require('../helper.js');
+const parseInline = require('./inline.js');
+const nodes = require('../nodes/block.js');
+const helper = require('./helper.js');
 
-const HEADING_REGEX = /^(#{1,6})\s?(.+)$/;
+const HEADING_REGEX = /^(#{1,})\s?(.+)$/;
 const ULIST_REGEX = /^(\s*)?[\-|\*]\s*(.+)$/;
 const OLIST_REGEX = /^(\s*)?([0-9]+)\.\s*(.+)$/;
 const HORIZONTAL_RULE_REGEX = /^[\*\-_\s]+$/;
@@ -33,52 +32,55 @@ module.exports = str => {
     if (char === '\n') {
       if (null !== (match = line.match(LINEBREAK_REGEX))) {
         if (!helper.isEmpty(stack)) {
-          ast.push(nodes.paragraph(stack + match[1]));
+          ast.push(new nodes.Paragraph(stack + match[1]));
         }
         stack = '';
       } else if (CODE_REGEX.test(line)) {
         if (mode === MODE_CODE) {
-          ast.push(nodes.code(stack));
+          ast.push(new nodes.Code(stack.trim()));
           mode = MODE_DEFAULT;
         } else {
           if (!helper.isEmpty(stack)) {
-            ast.push(nodes.paragraph(stack));
+            ast.push(new nodes.Paragraph(stack));
           }
           mode = MODE_CODE;
         }
         stack = '';
       } else if (null !== (match = line.match(BLOCKQUOTE_REGEX))) {
         if (!helper.isEmpty(stack)) {
-          ast.push(nodes.paragraph(stack));
+          ast.push(new nodes.Paragraph(stack));
         }
         stack = '';
-        ast.push(nodes.blockquote(match[2], match[1]));
+        ast.push(new nodes.Blockquote(match[2], match[1].length));
       } else if (HORIZONTAL_RULE_REGEX.test(line) && line.split(/[\*\-_]/).length > 3) {
         if (!helper.isEmpty(stack)) {
-          ast.push(nodes.paragraph(stack));
+          ast.push(new nodes.Paragraph(stack));
         }
         stack = '';
-        ast.push(nodes.horizontal());
+        ast.push(new nodes.Horizontal());
       } else if (null !== (match = line.match(HEADING_REGEX))) {
         if (!helper.isEmpty(stack)) {
-          ast.push(paragraph(stack));
+          ast.push(new nodes.Paragraph(stack));
         }
         stack = '';
-        ast.push(nodes.heading(match[2], match[1]));
+        ast.push(new nodes.Heading(match[2], match[1].length));
       } else if (null !== (match = line.match(ULIST_REGEX))) {
         if (!helper.isEmpty(stack)) {
-          ast.push(nodes.paragraph(stack));
+          ast.push(new nodes.Paragraph(stack));
         }
         stack = '';
         const indent = (match[1] || '').length;
         const prev = ast[ast.length - 1];
-        if (prev.type !== 'list' || prev.indent >= indent) {
-          ast.push(nodes.list(match[2], 0));
+        const check = match[2].match(/^\[(x|\u0020)?\]\s?(.+)$/);
+        if (!prev || prev.name !== 'list' || prev.indent >= indent) {
+          const list = check ? new nodes.CheckList(check[2], check[1] === 'x', 0) : new nodes.List(match[2], 0);
+          ast.push(list);
         } else {
-          prev.children.push(nodes.list(match[2], indent));
+          const list = check ? new nodes.CheckList(check[2], check[1] === 'x', indent) : new nodes.List(match[2], indent);
+          prev.children.push(list);
         }
       } else {
-        stack += `${line}\n`;
+        stack += line !== '' ? `${line}\n` : '';
       }
       line = '';
     } else {
@@ -86,7 +88,7 @@ module.exports = str => {
     }
   }
   if (!helper.isEmpty(stack)) {
-    ast.push(nodes.paragraph(stack.slice(0, -1)));
+    ast.push(new nodes.Paragraph(stack.slice(0, -1)));
   }
   return ast;
 };

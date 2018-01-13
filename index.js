@@ -1,5 +1,5 @@
-const parser = require('./lib/parser/index.js');
-const Tree = require('./lib/tree.js');
+const parser = require('./parser/index.js');
+const Tree = require('./Tree.js');
 
 module.exports = mdString => {
   const ast = parser(mdString);
