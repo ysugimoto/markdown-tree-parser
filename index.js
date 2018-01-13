@@ -1,3 +1,3 @@
-const parser = require('./lib/block-parser.js');
+const parser = require('./lib/block/parser.js');
 
 module.exports = parser;
