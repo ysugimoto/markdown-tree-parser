@@ -7,13 +7,13 @@ Parse markdown string to Abstract Syntax Tree which we defined.
 Import this package and apply markdown string.
 
 ```
-const markdwonTree = require('markdown-tree');
+const mtp = require('markdown-tree-parser');
 const text = `
 # Heading 1
 
 This is **markdown** text!`;
 
-const tree = markdwonTree(text);
+const tree = mtp(text);
 console.log(tree.dump());
 
 >>>

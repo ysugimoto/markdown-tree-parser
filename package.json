@@ -1,5 +1,5 @@
 {
-  "name": "markdown-tree",
+  "name": "markdown-tree-parser",
   "version": "0.9.0",
   "description": "Parse markdwon string to AST tree",
   "main": "index.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ysugimoto/markdown-tree.git"
+    "url": "git+https://github.com/ysugimoto/markdown-tree-parser.git"
   },
   "keywords": [
     "Markdown"
@@ -23,7 +23,7 @@
   "author": "Yoshiaki Sugimoto",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ysugimoto/markdown-tree/issues"
+    "url": "https://github.com/ysugimoto/markdown-tree-parser/issues"
   },
-  "homepage": "https://github.com/ysugimoto/markdown-tree#readme"
+  "homepage": "https://github.com/ysugimoto/markdown-tree-parser#readme"
 }
