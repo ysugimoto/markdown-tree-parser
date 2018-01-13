@@ -2,9 +2,9 @@
 
 Parse markdown string to Abstract Syntax Tree which we defined.
 
-## Installtion
+## Installation
 
-We published to `npmjs.org`. You can install via `npm` command:
+This package is available on `npmjs.org`. You can install via `npm` command:
 
 ```
 $ npm install markdown-tree-parser
