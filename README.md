@@ -13,8 +13,8 @@ const text = `
 
 This is **markdown** text!`;
 
-const tree= markdwonTree(text);
-console.log(tree);
+const tree = markdwonTree(text);
+console.log(tree.dump());
 
 >>>
 [
