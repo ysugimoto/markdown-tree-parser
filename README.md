@@ -76,7 +76,7 @@ console.log(tree.dump());
 - [x] horizontal rule
 - [x] blockquote
 - [x] unordeed list
-- [ ] ordeed list
+- [x] ordeed list
 
 ### Github Flavored Markdown sytax
 
