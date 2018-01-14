@@ -49,21 +49,28 @@ class Heading extends Node {
 }
 
 class List extends Node {
-  constructor(text, indent) {
+  constructor(text, level) {
     super('list', 'block');
-    this.indent = indent;
-    this.children = [];
+    this.level = level;
+    this.values = inlineParser(text);
+  }
+}
+
+class OrderedList extends Node {
+  constructor(text, order, level) {
+    super('orderedlist', 'block');
+    this.level = level;
+    this.order = order;
     this.values = inlineParser(text);
   }
 }
 
 class CheckList extends Node {
-  constructor(text, checked, indent) {
+  constructor(text, checked, level) {
     super('checklist', 'block');
-    this.indent = indent;
+    this.level = level;
     this.checked = checked;
     this.values = inlineParser(text);
-    this.children = [];
   }
 }
 
@@ -74,5 +81,6 @@ module.exports = {
   Blockquote,
   Heading,
   List,
-  CheckList
+  CheckList,
+  OrderedList
 };
