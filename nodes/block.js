@@ -74,6 +74,25 @@ class CheckList extends Node {
   }
 }
 
+class Table extends Node {
+  constructor(_rows) {
+    super('table', 'block');
+    const [heading, separator, ...rows] = _rows.map(line => line.replace(/^\||\|$/g, '').split('|'));
+    this.headings = heading.map(cell => cell.trim());
+    this.aligns = separator.map(cell => {
+      cell = cell.trim();
+      let align = 'left';
+      if (cell[cell.length - 1] === ':') {
+        align = cell[0] === ':' ? 'center': 'right';
+      }
+      return align;
+    });
+    this.rows = rows.map(row => {
+      return row.map(cell => inlineParser(cell.trim()));
+    });
+  }
+}
+
 module.exports = {
   Paragraph,
   Horizontal,
@@ -82,5 +101,6 @@ module.exports = {
   Heading,
   List,
   CheckList,
-  OrderedList
+  OrderedList,
+  Table
 };
