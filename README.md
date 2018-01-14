@@ -83,7 +83,7 @@ console.log(tree.dump());
 - [x] strikethrough [GFM extend]
 - [x] code
 - [x] task list (list with checkbox)
-- [ ] table
+- [x] table
 
 
 ## Author
