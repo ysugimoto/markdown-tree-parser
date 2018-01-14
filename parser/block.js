@@ -69,16 +69,29 @@ module.exports = str => {
           ast.push(new nodes.Paragraph(stack));
         }
         stack = '';
-        const indent = (match[1] || '').length;
         const prev = ast[ast.length - 1];
         const check = match[2].match(/^\[(x|\u0020)?\]\s?(.+)$/);
-        if (!prev || prev.name !== 'list' || prev.indent >= indent) {
-          const list = check ? new nodes.CheckList(check[2], check[1] === 'x', 0) : new nodes.List(match[2], 0);
-          ast.push(list);
-        } else {
-          const list = check ? new nodes.CheckList(check[2], check[1] === 'x', indent) : new nodes.List(match[2], indent);
-          prev.children.push(list);
+        let level = 1;
+        if (prev && (prev.name === 'list' || prev.name === 'checkedlist')) {
+          const indent = (match[1] || '').length;
+          level = (prev.level * 2 <= indent) ? prev.level + 1 : prev.level;
         }
+        const list = check ? new nodes.CheckList(check[2], check[1] === 'x', level) : new nodes.List(match[2], level);
+        ast.push(list);
+      } else if (null !== (match = line.match(OLIST_REGEX))) {
+        if (!helper.isEmpty(stack)) {
+          ast.push(new nodes.Paragraph(stack));
+        }
+        stack = '';
+        const prev = ast[ast.length - 1];
+        const check = match[2].match(/^\[(x|\u0020)?\]\s?(.+)$/);
+        let level = 1;
+        if (prev && (prev.name === 'orderedlcheckist' || prev.name === 'checkedlist')) {
+          const indent = (match[1] || '').length;
+          level = (prev.level * 2 <= indent) ? prev.level + 1 : prev.level;
+        }
+        const list = check ? new nodes.OrderedCheckList(check[2], check[1] === 'x', (match[2] | 0), level) : new nodes.OrderedList(match[3], (match[2] | 0), level);
+        ast.push(list);
       } else {
         stack += line !== '' ? `${line}\n` : '';
       }
