@@ -41,6 +41,11 @@ module.exports = str => {
   for (let i = 0; i < str.length; ++i) {
     const char = str[i];
 
+    // Skip carriage return
+    if (char === '\r') {
+      continue;
+    }
+
     if (char === '\n') {
       if (null !== (match = line.match(LINEBREAK_REGEX))) {
         parseParagraph(stack + match[1]);
