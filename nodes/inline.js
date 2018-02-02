@@ -10,6 +10,20 @@ class Text extends Node {
   }
 }
 
+class Html extends Node {
+  constructor(text) {
+    super('html', 'inline');
+    this.value = text;
+  }
+}
+
+class HtmlComment extends Node {
+  constructor(text) {
+    super('htmlcomment', 'inline');
+    this.value = text;
+  }
+}
+
 class Em extends Node {
   constructor(text) {
     super('em', 'inline');
@@ -69,6 +83,8 @@ class Link extends Node {
 
 module.exports = {
   Text,
+  Html,
+  HtmlComment,
   Em,
   Italic,
   EmItalic,

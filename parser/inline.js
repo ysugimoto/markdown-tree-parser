@@ -19,7 +19,7 @@ module.exports = text => {
   let stack = '';
   let mode = MODE_DEFAULT;
   let escapeSequence = false;
-  let match;
+  const html = [];
 
   for (let i = 0; i < text.length; ++i) {
     const char = text[i];
@@ -33,9 +33,9 @@ module.exports = text => {
     switch (char) {
       case "*":
         if (text[i + 1] === '*') {
-          i++
+          i++;
           if (text[i + 1] === '*') {
-            i++
+            i++;
             if (mode === MODE_ASTERISK_TRIPLE) {
               ast.push(new nodes.EmItalic(stack));
               mode = MODE_DEFAULT;
@@ -73,9 +73,9 @@ module.exports = text => {
         continue;
       case "_":
         if (text[i + 1] === '_') {
-          i++
+          i++;
           if (text[i + 1] === '_') {
-            i++
+            i++;
             if (mode === MODE_UNDERLINE_TRIPLE) {
               ast.push(new nodes.EmItalic(stack));
               mode = MODE_DEFAULT;
@@ -113,7 +113,7 @@ module.exports = text => {
         continue;
       case "~":
         if (text[i + 1] === '~') {
-          i++
+          i++;
           if (mode === MODE_STRIKETHROUGH) {
             ast.push(new nodes.Strikethrough(stack));
             mode = MODE_DEFAULT;
@@ -138,7 +138,32 @@ module.exports = text => {
           }
           mode = MODE_INLINE_CODE;
         }
-        stack ='';
+        stack = '';
+        continue;
+      case "<":
+        if (!helper.isEmpty(stack)) {
+          if (html.length === 0) {
+            ast.push(new nodes.Text(stack));
+          } else {
+            html[html.length - 1] += stack;
+          }
+          stack = '';
+        }
+        let c = char;
+        do {
+          stack += c;
+          c = text[++i];
+        } while(c != ">");
+        stack += c;
+        if (stack[1] === '/') {
+          const h = html.pop() + stack;
+          ast.push(new nodes.Html(h));
+        } else if (stack[1] === '!') {
+          ast.push(new nodes.HtmlComment(stack));
+        } else {
+          html.push(stack);
+        }
+        stack = '';
         continue;
       case "!":
         if (!helper.isEmpty(stack)) {
