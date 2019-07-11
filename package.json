@@ -1,6 +1,6 @@
 {
   "name": "markdown-tree-parser",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "Parse markdwon string to AST tree",
   "main": "index.js",
   "directories": {
